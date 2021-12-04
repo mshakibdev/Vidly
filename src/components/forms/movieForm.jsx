@@ -1,6 +1,6 @@
 import React, {Component} from "react";
-import {getGenres} from "../../services/fakeGenreService";
-import {getMovie, saveMovie} from "../../services/fakeMovieService";
+import {getGenres} from "../../services/genreService";
+import {getMovie, saveMovie} from "../../services/movieService";
 
 class MovieForm extends Component {
 	// state
@@ -15,9 +15,9 @@ class MovieForm extends Component {
 		genres: [],
 		errors: {},
 	};
-	componentDidMount() {
+	async componentDidMount() {
 		// ** fetch genre
-		const genres = getGenres();
+		const {data: genres} = await getGenres();
 		this.setState({
 			genres,
 		});
@@ -27,7 +27,7 @@ class MovieForm extends Component {
 		if (movieId === "new") return;
 
 		try {
-			const movie = getMovie(movieId);
+			const {data: movie} = await getMovie(movieId);
 			// let x = genres.filter((genre) => genre._id === movie.genreId);
 			//** api data's are general purpose to use according to our requirement need map it and make a suitable model as our requirements
 			// ** this mapping is done by mapToViewModel method
@@ -60,18 +60,19 @@ class MovieForm extends Component {
 	}
 
 	// !!form validation
-	handleSubmit(e) {
+	async handleSubmit(e) {
 		e.preventDefault();
-		const movie = this.state.movie;
+		let movie = this.state.movie;
 
-		saveMovie(movie);
-		this.props.history.push("/movies");
-		// 
+		await saveMovie(movie);
+		this.props.history.push("movies");
+		//
 	}
 	render() {
 		return (
 			<div className="container pt-20">
 				<h1>Movie Form</h1>
+
 				<form onSubmit={(e) => this.handleSubmit(e)}>
 					<div className="form-group">
 						<label htmlFor="title">Title</label>
@@ -89,13 +90,13 @@ class MovieForm extends Component {
 					<div className="form-group">
 						<label htmlFor="genreId">Genre</label>
 						<select
+							value={this.state.movie.genreId}
 							name="genreId"
 							onChange={(event) => this.handleOnChange(event)}
 							className="form-control form-select"
 							aria-label="Default select example">
-							console.log(this.state.genres);
 							{this.state.genres.map((genre) => (
-								<option selected key={genre._id} value={genre._id}>
+								<option key={genre._id} value={genre._id}>
 									{genre.name}
 								</option>
 							))}

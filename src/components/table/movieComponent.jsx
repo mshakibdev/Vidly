@@ -1,14 +1,14 @@
 import React, {Component} from "react";
-import {getMovies} from "../../services/fakeMovieService";
+import {getMovies} from "../../services/movieService";
+import {getGenres} from "../../services/genreService";
 import Pagination from "../common/pagination";
 import {paginate} from "../../util/paginate";
 import Genre from "../common/genreList";
-import {getGenres} from "../../services/fakeGenreService";
-import MoviesTable from "./moviesTable";
+import Table from "./tableComponent";
 import _ from "lodash";
 import {Link} from "react-router-dom";
 
-class MoviesChart extends Component {
+class Movie extends Component {
 	constructor() {
 		super();
 		this.handlePageChange = this.handlePageChange.bind(this);
@@ -28,13 +28,12 @@ class MoviesChart extends Component {
 			},
 		};
 	}
-	componentDidMount() {
-		let genreApiObject = getGenres();
-		let movieApiObject =  getMovies();
+	async componentDidMount() {
+		let {data: genreApiObject} = await getGenres();
+		let {data: movieApiObject} = await getMovies();
 
-		console.log("pai", movieApiObject);
 		//used for async vibe we can use state directly
-		const genres =  [{name: "All Genres", _id: ""}, ...genreApiObject];
+		const genres = [{name: "All Genres", _id: ""}, ...genreApiObject];
 
 		this.setState({
 			movies: movieApiObject,
@@ -99,7 +98,6 @@ class MoviesChart extends Component {
 		if (total_number_of_movies === 0) {
 			return <p className="m-4">There are no movies in the database</p>;
 		}
-		console.log("lo", this.state.searchQuery);
 		return (
 			<main className="container pt-20">
 				<div className="row">
@@ -111,9 +109,11 @@ class MoviesChart extends Component {
 						/>
 					</div>
 					<div className="col">
+						{/* //!  new movie button start */}
 						<Link to="/movies/new" className="btn btn-primary">
 							New Movie
 						</Link>
+						{/* //! new movie button start */}
 						<p className="m-4">Showing {total_number_of_movies} movies from the database</p>
 						<input
 							type="text"
@@ -123,7 +123,7 @@ class MoviesChart extends Component {
 							value={this.state.searchQuery}
 							onChange={this.handleSearch}
 						/>
-						<MoviesTable
+						<Table
 							onSortTable={this.handleSorting}
 							movieList={paginated_movies}
 							onDeleteMovie={this.handleDeleteMovie.bind(this)}
@@ -141,4 +141,4 @@ class MoviesChart extends Component {
 		);
 	}
 }
-export default MoviesChart;
+export default Movie;

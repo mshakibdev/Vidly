@@ -1,6 +1,6 @@
 import "./App.css";
 import React, {Component} from "react";
-import MoviesChart from "../components/table/movieTableComponent";
+import Movie from "../components/table/movieComponent";
 import Nav from "../components/common/nav";
 import {Redirect, Route, Switch} from "react-router";
 import Customer from "../components/pages/customer";
@@ -19,14 +19,14 @@ class App extends Component {
 					<Route path="/movies/:id" component={MovieForm} />
 					<Route path="/customer" component={Customer} />
 					<Route path="/rental" component={Rental} />
-					<Route exact path="/movies" component={MoviesChart} />
+					<Route exact path="/movies" component={Movie} />
 					<Route path="/login" component={Login} />
 					<Route path="/register" component={Register} />
+					<Redirect from="/" exact to="/movies" />
 
 					<Route path="/not-found" component={NotFound} />
 
 					<Redirect to="/not-found" />
-					<Redirect from="/" exact to="/movies" />
 				</Switch>
 			</div>
 		);

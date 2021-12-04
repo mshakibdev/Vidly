@@ -1,7 +1,4 @@
 import axios from "axios";
-
-import * as genresAPI from "./genreService";
-
 const movies = axios.get("http://localhost:3900/api/movies");
 
 export function getMovies() {
@@ -15,19 +12,17 @@ export function getMovie(id) {
 }
 
 export function saveMovie(movie) {
-	let movieInDb = movies.find((m) => m._id === movie._id) || {};
-	movieInDb.title = movie.title;
-	movieInDb.genre = genresAPI.genres.find((g) => g._id === movie.genreId);
-	movieInDb.numberInStock = movie.numberInStock;
-	movieInDb.dailyRentalRate = movie.dailyRentalRate;
+	// ** if movie exist in db
+	if (movie._id) {
+		const body = {...movie};
+		// ** removing movie_id from movie body because we are passing it through url it's confusing to pass id in both url and body
+		delete body._id;
 
-	if (!movieInDb._id) {
-		movieInDb._id = Date.now().toString();
-		movies.push(movieInDb);
-		console.log(movieInDb._id);
+		return axios.put("http://localhost:3900/api/movies" + "/" + movie._id, body);
 	}
 
-	return movieInDb;
+	// ** if movie doesn't exist we need to create one
+	return axios.post("http://localhost:3900/api/movies", movie);
 }
 
 export function deleteMovie(id) {
